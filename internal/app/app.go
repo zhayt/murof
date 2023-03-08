@@ -13,7 +13,7 @@ import (
 	"syscall"
 )
 
-const migrationPath = "migrations/20230306_init.up.sql"
+const migrationPath = "migrations/20230308_init.up.sql"
 
 func Run(config *config.Config) error {
 	storage, err := sqlite.NewStorage(config.Database.Driver, config.Database.DSN)
