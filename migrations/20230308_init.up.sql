@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS user (
 CREATE TABLE IF NOT EXISTS session (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INT NOT NULL,
-    token TEXT NOT NULL,
+    token TEXT UNIQUE NOT NULL,
     expiration_time DATETIME NOT NULL
 );
 
