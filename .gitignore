@@ -1,2 +1,4 @@
 .idea
+cmd/local
+migrations
 *.db
