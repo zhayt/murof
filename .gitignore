@@ -1,4 +1,3 @@
 .idea
-cmd/local
-migrations
+migrationsmigration/
 *.db
