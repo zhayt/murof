@@ -15,6 +15,15 @@ type IUserStorage interface {
 }
 
 type IPostStorage interface {
+	CreatePost(ctx context.Context, post model.Post) error
+	GetAllPosts(ctx context.Context) ([]model.Post, error)
+	GetPostByID(ctx context.Context, postID int) (*model.Post, error)
+	GetPostsByCategory(ctx context.Context, categories []string) ([]model.Post, error)
+	GetUserPosts(ctx context.Context, userID int) ([]model.Post, error)
+	GetUserCommentPosts(ctx context.Context, userID int) ([]model.Post, error)
+	GetUserLikedPosts(ctx context.Context, userID int) ([]model.Post, error)
+	UpdatePost(ctx context.Context, post model.Post, postID int) error
+	DeletePost(ctx context.Context, postID int) error
 }
 
 type ICommentStorage interface {
