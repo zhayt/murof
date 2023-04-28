@@ -1,0 +1,54 @@
+CREATE TABLE IF NOT EXISTS user(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    password TEXT UNIQUE,
+    login TEXT UNIQUE,
+    username TEXT UNIQUE,
+    token TEXT DEFAULT NULL,
+    tokenduration DATETIME DEFAULT NULL
+);
+
+CREATE TABLE IF NOT EXISTS post(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    author TEXT,
+    title TEXT,
+    description TEXT,
+    like INTEGER DEFAULT 0,
+    dislike INTEGER DEFAULT 0,
+    date TEXT,
+    ategory TEXT,
+    FOREIGN KEY(user_id) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS comment(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    postId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    author TEXT,
+    text TEXT,
+    like INTEGER DEFAULT 0,
+    dislike INTEGER DEFAULT 0,
+    date TEXT,
+    FOREIGN KEY(postId) REFERENCES post(id),
+    FOREIGN KEY(userId) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS like(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    postId INTEGER NOT NULL,
+    userId INTEGER NOT NULL,
+    commentId INTEGER,
+    ctive INTEGER DEFAULT 0,
+    FOREIGN KEY(postId) REFERENCES post(id),
+    FOREIGN KEY(userId) REFERENCES user(id)
+);
+
+CREATE TABLE IF NOT EXISTS dislike(
+    id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    postId INTEGER,
+    userId INTEGER,
+    commentId INTEGER,
+    active INTEGER DEFAULT 0,
+    FOREIGN KEY(postId) REFERENCES post(id),
+    FOREIGN KEY(userId) REFERENCES user(id)
+);
