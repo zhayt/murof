@@ -27,6 +27,8 @@ type IPostStorage interface {
 }
 
 type ICommentStorage interface {
+	CreateComment(ctx context.Context, comment model.Comment) error
+	GetCommentByPostID(ctx context.Context, postID int) (*[]model.Comment, error)
 }
 
 type Storage struct {
