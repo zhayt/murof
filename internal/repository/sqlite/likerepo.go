@@ -96,13 +96,13 @@ func (r *LikeRepo) SetCommentLike(like model.Like) error {
 	query := `INSERT INTO like(commentId,userId,active) VALUES(?, ?, ?) `
 
 	if _, err := r.db.Exec(query, like.CommentId, like.UserID, like.Active); err != nil {
-		fmt.Println("SETCOMMENTLIKE error" + err.Error())
+		return fmt.Errorf("couldn't set comment like: %w", err)
 	}
 
 	query = `update comment set like=(select count(*) from like where commentId=?) where id=?`
 
 	if _, err = r.db.Exec(query, like.CommentId, like.CommentId); err != nil {
-		fmt.Println("SETCOMMENTLIKE error" + err.Error())
+		return fmt.Errorf("couldn't increase comment like: %w", err)
 	}
 
 	return nil
@@ -116,7 +116,7 @@ func (r *LikeRepo) CheckCommentLike(CommentID, UserID int) error {
 	var likeID int
 
 	if err = row.Scan(&likeID); err != nil {
-		return err
+		return fmt.Errorf("couldn't check comment like: %w", err)
 	}
 
 	return nil
@@ -126,13 +126,13 @@ func (r *LikeRepo) DeleteCommentLike(CommentID, UserID int) error {
 	query := `delete from like where userId = ? and commentId = ?`
 
 	if _, err = r.db.Exec(query, UserID, CommentID); err != nil {
-		return fmt.Errorf("delete post like: %w", err)
+		return fmt.Errorf("couldn't delete comment like: %w", err)
 	}
 
 	query = `update comment set like=(select count(*) from like where commentId=?) where id=?`
 
 	if _, err = r.db.Exec(query, CommentID, CommentID); err != nil {
-		fmt.Println("SETCOMMENTLIKE error" + err.Error())
+		return fmt.Errorf("couldn't decrease comment like: %w", err)
 	}
 
 	return nil
@@ -145,8 +145,8 @@ func (r *LikeRepo) CheckCommentDislike(CommentID, UserID int) error {
 
 	var likeID int
 
-	if err := row.Scan(&likeID); err != nil {
-		return err
+	if err = row.Scan(&likeID); err != nil {
+		return fmt.Errorf("couldn't check comment dislike: %w", err)
 	}
 
 	return nil
@@ -156,12 +156,12 @@ func (r *LikeRepo) DeleteCommentDislike(CommentID, UserID int) error {
 	query := `delete from dislike where userId = ? and commentId = ?`
 
 	if _, err = r.db.Exec(query, UserID, CommentID); err != nil {
-		return fmt.Errorf("delete post like: %w", err)
+		return fmt.Errorf("couldn't delete comment dislike: %w", err)
 	}
 
 	query = `update comment set dislike=(select count(*) from dislike where commentId=?) where id=?`
 	if _, err = r.db.Exec(query, CommentID, CommentID); err != nil {
-		fmt.Println("SET COMMENT DISLIKE error" + err.Error())
+		return fmt.Errorf("couldn't decrease comment dislike: %w", err)
 	}
 
 	return nil
