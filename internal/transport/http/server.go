@@ -23,7 +23,7 @@ type Server struct {
 	shutdownTimeOut time.Duration
 }
 
-func NewServer(cfg config.Config, l *logger.Logger, handler *handler.Handler, mid *middleware.Middleware) *Server {
+func NewServer(cfg *config.Config, l *logger.Logger, handler *handler.Handler, mid *middleware.Middleware) *Server {
 	srv := &http.Server{
 		Addr:              net.JoinHostPort("", cfg.Server.Port),
 		MaxHeaderBytes:    1 << 20,

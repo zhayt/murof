@@ -10,3 +10,7 @@ type User struct {
 	Token         string
 	TokenDuration time.Time
 }
+
+type ctxKey int8
+
+const CtxUserKey ctxKey = iota
