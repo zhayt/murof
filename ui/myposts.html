@@ -9,6 +9,10 @@
     <title>My posts</title>  
 </head>
 <body>
+
+    <!-- User Авторизован -->
+
+
     {{if .Username}}
     <div class="hamburger-menu">
       <input id="menu__toggle" type="checkbox" />
@@ -19,9 +23,9 @@
           <div class="dropdown">
               <button class="dropbtn"> Favorites</button>
               <div class="dropdown-content">
-                  <a href="/myposts"><button type="button" class="cate">My Posts</button></a>
-                  <a href="/my-comment-posts"><button type="button" class="cate">My Comment Posts</button></a>
-                  <a href="/my-liked-posts"><button type="button" class="cate">My Liked Posts</button></a>
+                  <a href="/myPosts"><button type="button" class="cate">My Posts</button></a>
+                  <a href="/myCommentPosts"><button type="button" class="cate">My Comment Posts</button></a>
+                  <a href="/myLikedPosts"><button type="button" class="cate">My Liked Posts</button></a>
               </div>
             </div>
 
@@ -46,18 +50,22 @@
       </div>
       </ul>
     </div>
+    
+    
     <div class="logo" id="logo5">
       <a href="/">FORUM</a>
       <h1>My posts</h1>
     </div>
+
+    
     <div class="header">
         <div class="col1">
             <div class="dropdown">
                 <button class="dropbtn"> Favorites</button>
                 <div class="dropdown-content">
-                    <a href="/myposts"><button type="button" class="cate">My Posts</button></a>
-                    <a href="/my-comment-posts"><button type="button" class="cate">My Comment Posts</button></a>
-                    <a href="/my-liked-posts"><button type="button" class="cate">My Liked Posts</button></a>
+                    <a href="/myPosts"><button type="button" class="cate">My Posts</button></a>
+                    <a href="/myCommentPosts"><button type="button" class="cate">My Comment Posts</button></a>
+                    <a href="/myLikedPosts"><button type="button" class="cate">My Liked Posts</button></a>
                 </div>
               </div>
 
