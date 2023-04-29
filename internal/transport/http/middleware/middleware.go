@@ -17,15 +17,15 @@ type Middleware struct {
 }
 
 func (m *Middleware) LogRequest(next http.HandlerFunc) http.HandlerFunc {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		m.l.Info.Println(fmt.Sprintf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.String()))
 
 		next.ServeHTTP(w, r)
-	})
+	}
 }
 
-func NewMiddleware(user service.Authorization) *Middleware {
-	return &Middleware{user: user}
+func NewMiddleware(user service.Authorization, l *logger.Logger) *Middleware {
+	return &Middleware{user: user, l: l}
 }
 
 func (m *Middleware) WithSessionBlocked(next http.HandlerFunc) http.HandlerFunc {

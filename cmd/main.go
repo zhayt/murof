@@ -40,7 +40,7 @@ func run() error {
 	serv := service.NewService(repo, l)
 
 	controller := handler.NewHandler(serv, l)
-	mid := middleware.NewMiddleware(serv)
+	mid := middleware.NewMiddleware(serv, l)
 
 	httpServer := http.NewServer(cfg, l, controller, mid)
 

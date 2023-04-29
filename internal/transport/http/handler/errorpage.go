@@ -17,7 +17,8 @@ func errorHandler(w http.ResponseWriter, message string, code int) {
 		http.Error(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 		return
 	}
-	// w.WriteHeader(code)
+
+	w.WriteHeader(code)
 	if err = html.Execute(w, errorBody); err != nil {
 		// fmt.Println(err)
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
