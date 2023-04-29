@@ -92,6 +92,8 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
+
+			return
 		}
 		for i := '0'; i <= '4'; i++ {
 			if r.FormValue("category"+string(i)) != "" {
