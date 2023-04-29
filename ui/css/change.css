@@ -18,7 +18,7 @@ body {
 
 h1 {
     text-align: center;
-    color: #008000;
+    color: #3e87da;
 }
 
 label {
@@ -37,11 +37,11 @@ input[type=text] {
 }
 
 input[type=text]:focus {
-    border: 2px solid #008000;
+    border: 2px solid #3e87da;
 }
 
 button[type=submit] {
-    background-color: #008000;
+    background-color: #3e87da;
     color: #ffffff;
     padding: 10px 20px;
     border: none;
@@ -52,7 +52,7 @@ button[type=submit] {
 }
 
 button[type=submit]:hover {
-    background-color: #005200;
+    background-color: #3e87da;
 }
 
 .signin {
@@ -61,7 +61,8 @@ button[type=submit]:hover {
 }
 
 .signin a {
-    color: #008000;
+    background-color: #3e87da;
+    color: #3e87da;
     text-decoration: none;
 }
 
@@ -69,63 +70,63 @@ button[type=submit]:hover {
     text-decoration: underline;
 }
 * {
-box-sizing: border-box;
+    box-sizing: border-box;
 }
 
 body {
-background-color: #f1f1f1;
-font-family: Arial, sans-serif;
+    background-color: #f1f1f1;
+    font-family: Arial, sans-serif;
 }
 
 .container {
-background-color: #fff;
-margin: 50px auto;
-max-width: 600px;
-padding: 30px;
-border-radius: 10px;
-box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+    background-color: #fff;
+    margin: 50px auto;
+    max-width: 600px;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
 h1 {
-text-align: center;
-color: #333;
-margin-bottom: 30px;
+    text-align: center;
+    color: #333;
+    margin-bottom: 30px;
 }
 
 label {
-display: block;
-margin-bottom: 10px;
-font-weight: bold;
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
 }
 
 input[type="text"] {
-width: 100%;
-padding: 10px;
-margin-bottom: 20px;
-border: none;
-border-radius: 5px;
-background-color: #f7f7f7;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f7f7f7;
 }
 
 input[type="text"]:focus {
-outline: none;
-box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.3);
 }
 
 button[type="submit"] {
-background-color: #008000;
-color: #fff;
-padding: 10px 20px;
-border: none;
-border-radius: 5px;
-cursor: pointer;
-width: 100%;
-font-size: 16px;
-transition: background-color 0.3s ease;
+    background-color: #3e87da;
+    color: #fff;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
 }
 
 button[type="submit"]:hover {
-background-color: #005200;
+background-color: #3e87da;
 }
 
 .signin {
@@ -135,11 +136,11 @@ font-size: 14px;
 }
 
 .signin a {
-color: #008000;
+color: #3e87da;
 text-decoration: none;
 transition: color 0.3s ease;
 }
 
 .signin a:hover {
-color: #005200;
+color: #3e87da;
 }
