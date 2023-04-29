@@ -1,13 +1,14 @@
        
 body {
-    background-color: #eaf7ee;
+    background-color: #ffffff;
 }
+
 .post {
     margin-right: auto;
     margin-left: auto;
-    width: 50%;
+    width: 45%;
     border-radius: 10px;
-    background-color: #c3e6cb;
+    background-color: #ffffff;
     margin-top: 10px;
     box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.3);
     transition: transform 0.2s;
@@ -20,7 +21,7 @@ body {
 .row1 {
     display: flex;
     justify-content: space-between;
-    background-color: #8bc34a;
+    background-color: #3e87da;
     color: #ffffff;
     padding: 10px;
     border-radius: 10px 10px 0 0;
@@ -28,12 +29,12 @@ body {
 .row2 {
     display: flex;
     justify-content: center;
-    background-color: #c3e6cb;
+    background-color: #ffffff;
     padding: 10px;
 }
 .row3 {
     display: flex;
-    background-color: #c3e6cb;
+    background-color: #ffffff;
     padding: 10px;
 }
 .content {
@@ -50,7 +51,8 @@ body {
     display: flex;
     justify-content: space-between;
     padding: 10px;
-    background-color: #c3e6cb;
+    background-color: #ffffff;
+    color: #3e87da;
     border-radius: 0 0 10px 10px;
 }
 .likeAndDislike {
@@ -77,6 +79,10 @@ a:hover {
     justify-content: space-between;
 }
 
+.headerNoAuth {
+    display: flex;
+    justify-content: space-between;
+}
 .vote {
     border: medium none;
     background-image: none; 
@@ -111,8 +117,15 @@ a:hover {
     display: block;
     text-align: center;
 }
+
+.logo h1 {
+    color: #3e87da;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
 .logo a{
-    color: green;
+    color: #3e87da;
+    font-family: Arial, Helvetica, sans-serif;
     font-size: 36px;
     font-weight: bold;
 }  
@@ -120,15 +133,26 @@ a:hover {
     padding: 10px 20px;
     border-radius: 5px;
     border: none;
-    background-color: #8bc34a;
+    background-color: #3e87da;
     color: #ffffff;
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.2s;
 }
 
+.TagCategory {
+    padding: 10px 20px;
+    border-radius: 60px;
+    border-color: rgb(0, 0, 0);
+    background-color: #ffffff;
+    color: #3e87da;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
 .back:hover, .dropbtn:hover {
-    background-color: #689f38;
+    background-color: #3e87da;
 }
 .back1 {
     background-color: #ff0000;
@@ -149,6 +173,26 @@ a:hover {
     transition: background-color 0.2s;
     text-align: left;
 }
+
 .cate:hover, .catrow:hover{
     background-color: #acacac;
+}
+
+
+@media (max-width: 700px) {
+    .row1 {
+        display: block;
+        background-color: #3e87da;
+        color: #ffffff;
+        padding: 10px;
+        border-radius: 10px 10px 0 0;
+    }
+    .row4 {
+        flex-wrap: wrap;
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        background-color: #c3e6cb;
+        border-radius: 0 0 10px 10px;
+    }
 }
