@@ -47,7 +47,7 @@ func (a *AuthRepo) GetUserByToken(token string) (model.User, error) {
 
 	sqlRow := a.db.QueryRow(query, token)
 	if err = sqlRow.Scan(&fullUser.Id, &fullUser.Password, &fullUser.Login, &fullUser.Username, &fullUser.Token, &fullUser.TokenDuration); err != nil {
-		return model.User{}, err
+		return model.User{}, fmt.Errorf("couldn't get user by token: %w", err)
 	}
 
 	return fullUser, nil

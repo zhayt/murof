@@ -27,6 +27,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		password := r.FormValue("psw")
 		user, err := h.service.GenerateToken(email, password)
 		if err != nil {
+			h.l.Error.Printf("Generate toke error: %s", err.Error())
 			if errors.Is(err, service.InvalidDate) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
@@ -40,6 +41,8 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 				Value: user.Token,
 				Path:  "/",
 			})
+
+			h.l.Info.Printf("the user is logged in6 email:%s", user.Login)
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 	default:

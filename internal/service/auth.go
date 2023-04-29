@@ -1,12 +1,12 @@
 package service
 
 import (
+	"fmt"
 	"github.com/gofrs/uuid"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/repository"
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 	"net/mail"
 	"time"
 )
@@ -45,17 +45,16 @@ func (s *AuthService) CreateUser(user model.User) error {
 func (s *AuthService) GenerateToken(login, password string) (model.User, error) {
 	user, err := s.repo.GetUser(login)
 	if err != nil {
-		return empty, InvalidDate
+		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidDate)
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password+salt)); err != nil {
-		return empty, InvalidDate
+		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidDate)
 	}
 
 	token, err := uuid.NewV4()
 	if err != nil {
-		log.Print(err)
-		return empty, err
+		return empty, fmt.Errorf("couldn't generate token: %w", err)
 	}
 
 	user.Token = token.String()
