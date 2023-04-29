@@ -32,7 +32,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		}
 	case http.MethodPost:
 		title := r.FormValue("title")
-		category := r.FormValue("category")
+		category := r.Form["category"]
 		content := r.FormValue("content")
 
 		post := model.Post{
@@ -46,6 +46,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 
 		err := h.service.Post.CreatePost(post)
 		if err != nil {
+			h.l.Error.Printf("Create post error: %s", err.Error())
 			if errors.Is(err, service.InvalidDate) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
@@ -54,6 +55,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		h.l.Info.Printf("Post created")
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 	default:
 		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
@@ -226,7 +228,7 @@ func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case http.MethodPost:
-		category := r.FormValue("category")
+		category := r.Form["category"]
 
 		title := r.FormValue("title")
 

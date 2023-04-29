@@ -9,6 +9,6 @@ type Post struct {
 	AuthorId    int
 	Author      string
 	Date        string
-	Category    string
+	Category    []string
 	Path        string
 }

@@ -32,7 +32,7 @@ func run() error {
 
 	l := logger.NewLogger()
 
-	repo, err := repository.NewRepository(cfg)
+	repo, err := repository.NewRepository(cfg, l)
 	if err != nil {
 		return err
 	}

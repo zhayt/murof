@@ -4,6 +4,7 @@ import (
 	"github.com/zhayt/clean-arch-tmp-forum/config"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/repository/sqlite"
+	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"time"
 )
 
@@ -63,7 +64,7 @@ type Repository struct {
 	Dislike
 }
 
-func NewRepository(cfg *config.Config) (*Repository, error) {
+func NewRepository(cfg *config.Config, l *logger.Logger) (*Repository, error) {
 	db, err := sqlite.Dial(cfg)
 	if err != nil {
 		return nil, err
@@ -75,7 +76,7 @@ func NewRepository(cfg *config.Config) (*Repository, error) {
 
 	return &Repository{
 		Authorization: sqlite.NewAuthRepo(db),
-		Post:          sqlite.NewPostRepo(db),
+		Post:          sqlite.NewPostRepo(db, l),
 		Comment:       sqlite.NewCommentRepo(db),
 		Like:          sqlite.NewLikeRepo(db),
 		Dislike:       sqlite.NewDislikeRepo(db),
