@@ -173,19 +173,29 @@ button:hover {
             <input type="text" placeholder="Enter Content" name="content" required>
             <form>
               <p>Please select your preferred contact method:</p>
-              <form action="/" method="post">
-                  <input class="form-check-input" type="radio" name="category" value="0" id="flexCheckDefault" >
+              <form action="/" method="post" class="form-inline">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="category[]" value="0" id="flexCheckDefault" >
                   <label class="form-check-label" for="flexCheckDefault"> IT </label>
-                  <input class="form-check-input" type="radio" name="category" value="1" id="flexCheckChecked" >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="category[]" value="1" id="flexCheckChecked" >
                   <label class="form-check-label" for="flexCheckChecked"> Sport </label>
-                  <input class="form-check-input" type="radio" name="category" value="2" id="flexCheckChecked" >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="category[]" value="2" id="flexCheckChecked" >
                   <label class="form-check-label" for="flexCheckChecked"> Education </label>
-                  <input class="form-check-input" type="radio" name="category" value="3" id="flexCheckChecked" >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="category[]" value="3" id="flexCheckChecked" >
                   <label class="form-check-label" for="flexCheckChecked"> News </label>
-                  <input class="form-check-input" type="radio" name="category" value="4" id="flexCheckChecked" >
+                </div>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" name="category[]" value="4" id="flexCheckChecked" >
                   <label class="form-check-label" for="flexCheckChecked"> Health </label>
+                </div>
                   <input class="btn btn-outline-success mx-1" type="reset" value="Reset">
-              </form>
+             </form>
             
             </form>
             <button type="submit" style="margin-bottom: 5px;">Create</button>
