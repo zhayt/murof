@@ -1,10 +1,10 @@
 package handler
 
 import (
-	"fmt"
+	"errors"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
+	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 	"html/template"
-	"log"
 	"net/http"
 	"strconv"
 	"strings"
@@ -12,8 +12,6 @@ import (
 )
 
 func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
-	temp, _ := template.ParseFiles("ui/createpost.html")
-
 	user := r.Context().Value(model.CtxUserKey).(model.User)
 
 	if user.Username == "" {
@@ -21,11 +19,22 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
+	case http.MethodGet:
+		temp, err := template.ParseFiles("ui/createpost.html")
+		if err != nil {
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		if err = temp.Execute(w, temp); err != nil {
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 	case http.MethodPost:
 		title := r.FormValue("title")
 		category := r.FormValue("category")
-		fmt.Println(category)
 		content := r.FormValue("content")
+
 		post := model.Post{
 			Title:       title,
 			Description: content,
@@ -34,13 +43,22 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 			Date:        time.Now().Format("January 2, 2006 15:04:05"),
 			Category:    category,
 		}
+
 		err := h.service.Post.CreatePost(post)
 		if err != nil {
-			log.Fatal(err)
+			if errors.Is(err, service.InvalidDate) {
+				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
+
 		http.Redirect(w, r, "/", http.StatusSeeOther)
+	default:
+		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
-	temp.Execute(w, temp)
+
 }
 
 type DispPost struct {
@@ -50,6 +68,7 @@ type DispPost struct {
 	Auth     bool
 }
 
+// Не понятно зачем нужен свич кейс
 func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 	PostID := r.URL.Query().Get("id")
 	user := r.Context().Value(model.CtxUserKey).(model.User)
@@ -67,19 +86,21 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	DispPost := DispPost{
+	dispPost := DispPost{
 		Username: user.Username,
 		Post:     *post,
 		Comments: []model.Comment{},
 	}
-	DispPost.Auth = DispPost.Username == DispPost.Post.Author
+
+	dispPost.Auth = dispPost.Username == dispPost.Post.Author
 	switch r.Method {
 	case http.MethodGet:
 		comments, err := h.service.Comment.GetCommentByPostID(post.Id)
 		if err != nil {
-			log.Fatal("handler", err)
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
 		}
-		DispPost.Comments = *comments
+		dispPost.Comments = *comments
 	case http.MethodPost:
 		if r.FormValue("postLike") != "" {
 			postId, _ := strconv.Atoi(r.FormValue("postLike"))
@@ -87,19 +108,26 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 				UserID: user.Id,
 				PostID: postId,
 			}
+
 			if err := h.service.Like.SetPostLike(like); err != nil {
-				log.Fatal(err)
+				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
 			}
+
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
 		} else if r.FormValue("postDislike") != "" {
 			postId, _ := strconv.Atoi(r.FormValue("postDislike"))
+
 			dislike := model.Dislike{
 				UserID: user.Id,
 				PostID: postId,
 			}
-			if err := h.service.Dislike.SetPostDislike(dislike); err != nil {
-				log.Fatal(err)
+
+			if err = h.service.Dislike.SetPostDislike(dislike); err != nil {
+				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
 			}
+
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
 		}
 
@@ -109,30 +137,41 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 				UserID:    user.Id,
 				CommentId: commentId,
 			}
+
 			if err := h.service.Like.SetCommentLike(like); err != nil {
-				log.Fatal(err)
+				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
 			}
+
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
+
 		} else if r.FormValue("commentDislike") != "" {
 			commentId, _ := strconv.Atoi(r.FormValue("commentDislike"))
+
 			dislike := model.Dislike{
 				UserID:    user.Id,
 				CommentId: commentId,
 			}
-			if err := h.service.Dislike.SetCommentDislike(dislike); err != nil {
-				log.Fatal(err)
+
+			if err = h.service.Dislike.SetCommentDislike(dislike); err != nil {
+				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
 			}
+
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
 		}
+
 		if user.Token == "" {
 			http.Redirect(w, r, "/signin", http.StatusSeeOther)
 			return
 		}
+
 		commentText := r.FormValue("comment")
 		if strings.TrimSpace(commentText) == "" {
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
 			return
 		}
+
 		comment := model.Comment{
 			UserId: user.Id,
 			PostId: post.Id,
@@ -140,81 +179,89 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 			Author: user.Username,
 			Date:   time.Now().Format("01-02-2006 15:04:05"),
 		}
-		if err := h.service.Comment.CreateComment(comment); err != nil {
-			fmt.Println(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
+
+		if err = h.service.Comment.CreateComment(comment); err != nil {
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+
 		http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
+
 	default:
-		w.WriteHeader(http.StatusMethodNotAllowed)
+		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 
 	temp, err := template.ParseFiles("ui/postpage.html")
 	if err != nil {
-		log.Fatal(err)
+		errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
 	}
-	// fmt.Println(DispPost)
-	temp.Execute(w, DispPost)
+
+	if err = temp.Execute(w, dispPost); err != nil {
+		errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+		return
+	}
 }
 
 func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
-	//temp, _ := template.ParseFiles("ui/changepost.html")
 	postId := r.URL.Query().Get("id")
-	//fmt.Println(postId)
-
 	oldPost, err := h.service.GetPostByID(postId)
-
 	if err != nil {
-		fmt.Println("error che tam")
+		errorHandler(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
 	}
-	//fmt.Println(oldPost)
+
 	switch r.Method {
+	case http.MethodGet:
+		temp, err := template.ParseFiles("ui/changepost.html")
+		if err != nil {
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		if err = temp.Execute(w, oldPost); err != nil {
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
 	case http.MethodPost:
 		category := r.FormValue("category")
-		//fmt.Println(category)
+
 		title := r.FormValue("title")
 
 		description := r.FormValue("content")
 
-		//fmt.Println(title, description, category)
 		newPost := model.Post{
 			Title:       title,
 			Description: description,
 			Category:    category,
 		}
-		//fmt.Println(newPost)
 
 		if err := h.service.Post.ChangePost(newPost, *oldPost, user); err != nil {
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 		http.Redirect(w, r, "/post/?id="+postId, http.StatusSeeOther)
+	default:
+		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 	}
-	//temp.Execute(w, temp)
-	temp, err := template.ParseFiles("ui/changepost.html")
-	if err != nil {
-		log.Fatal(err)
-	}
-	// fmt.Println(DispPost)
-	temp.Execute(w, oldPost)
-
 }
 
 func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
-	user := r.Context().Value(model.CtxUserKey).(model.User)
-	postId := r.URL.Query().Get("id")
-	post, err := h.service.GetPostByID(postId)
-
-	if err != nil {
-		fmt.Println("error che tam")
-	}
-	if err := h.service.Post.DeletePost(user.Id, *post); err != nil {
-		fmt.Println(4)
-		fmt.Println(err)
-		errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+	if r.Method != http.MethodDelete {
+		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
+
+	user := r.Context().Value(model.CtxUserKey).(model.User)
+	postID, err := strconv.Atoi(r.URL.Query().Get("id"))
+	if err != nil {
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	_ = h.service.Post.DeletePost(user.Id, postID)
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }

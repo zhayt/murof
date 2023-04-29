@@ -24,11 +24,11 @@ func NewPostRepo(db *sql.DB) *PostRepo {
 
 func (p *PostRepo) CreatePost(post model.Post) error {
 	query := `INSERT INTO post (user_id, author, title, description, date,category) VALUES ($1, $2, $3, $4, $5, $6)`
-	_, err = p.db.Exec(query, post.AuthorId, post.Author, post.Title, post.Description, post.Date, post.Category)
-	if err != nil {
 
-		return fmt.Errorf("create post: %w", err)
+	if _, err = p.db.Exec(query, post.AuthorId, post.Author, post.Title, post.Description, post.Date, post.Category); err != nil {
+		return fmt.Errorf("couldn't create post: %w", err)
 	}
+
 	return nil
 }
 
@@ -144,9 +144,9 @@ func (p *PostRepo) GetPostsByCategoty(category []string) ([]model.Post, error) {
 	return posts, nil
 }
 
-func (p *PostRepo) DeletePost(PostID int) error {
-	query := `delete from post where  id = ?`
-	_, err := p.db.Exec(query, PostID)
+func (p *PostRepo) DeletePost(userID int, postID int) error {
+	query := `delete from post where  id = ? AND user_id = ?`
+	_, err := p.db.Exec(query, postID, userID)
 	if err != nil {
 		return fmt.Errorf("delete post: %w", err)
 	}

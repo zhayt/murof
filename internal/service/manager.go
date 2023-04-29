@@ -22,7 +22,7 @@ type Post interface {
 	ShowMyPosts(userId int) ([]model.Post, error)
 	ShowMyCommentPosts(userId int) ([]model.Post, error)
 	ShowMyLikedPosts(userId int) ([]model.Post, error)
-	DeletePost(int, model.Post) error
+	DeletePost(userID int, postID int) error
 }
 type Comment interface {
 	CreateComment(model.Comment) error

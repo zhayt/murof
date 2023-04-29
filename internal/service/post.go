@@ -1,12 +1,14 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/repository"
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"log"
 	"strconv"
+	"strings"
 )
 
 type PostService struct {
@@ -21,16 +23,32 @@ func NewPostService(repo repository.Post, l *logger.Logger) *PostService {
 	}
 }
 
+var InvalidDate = errors.New("invalid date")
+
 func (p *PostService) CreatePost(post model.Post) error {
-	return p.repo.CreatePost(post)
+	post.Title = strings.TrimSpace(post.Title)
+	post.Description = strings.TrimSpace(post.Description)
+
+	if post.Title == "" || post.Description == "" {
+		return InvalidDate
+	}
+
+	categories := []string{"IT", "Education", "Spot", "News"}
+	for _, category := range categories {
+		if post.Category == category {
+			return p.repo.CreatePost(post)
+		}
+	}
+
+	return InvalidDate
 }
 
 func (p *PostService) ShowAllPosts() ([]model.Post, error) {
 	posts, err := p.repo.ShowAllPosts()
 	if err != nil {
-		log.Println(err)
-		return nil, err
+		return []model.Post{}, err
 	}
+
 	return posts, nil
 }
 
@@ -93,12 +111,10 @@ func (p *PostService) GetPostsByCategoty(category []string) ([]model.Post, error
 	return posts, nil
 }
 
-func (p *PostService) DeletePost(userId int, post model.Post) error {
-	if userId != post.AuthorId {
-		return fmt.Errorf("you can't delete this post! because you aren't the author!")
-	}
-	if err := p.repo.DeletePost(post.Id); err != nil {
+func (p *PostService) DeletePost(userID int, postID int) error {
+	if err := p.repo.DeletePost(userID, postID); err != nil {
 		return err
 	}
+
 	return nil
 }

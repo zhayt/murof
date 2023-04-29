@@ -1,7 +1,6 @@
 package service
 
 import (
-	"fmt"
 	"github.com/gofrs/uuid"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/repository"
@@ -29,15 +28,16 @@ func NewAuthService(repo repository.Authorization, l *logger.Logger) *AuthServic
 
 func (s *AuthService) CreateUser(user model.User) error {
 	if !checkLogin(user.Login) {
-		return fmt.Errorf("UNCORRECT LOGIN")
+		return InvalidDate
 	}
 	if !checkPassword(user.Password) {
-		return fmt.Errorf("UNCORRECT PASSWORD")
+		return InvalidDate
 	}
 	if !checkUsername(user.Username) {
-		return fmt.Errorf("UNCORRECT USERNAME")
+		return InvalidDate
 	}
-	user.Password = s.GeneratePassword(user.Password)
+
+	user.Password = generatePassword(user.Password)
 
 	return s.repo.CreateUser(user)
 }
@@ -45,12 +45,13 @@ func (s *AuthService) CreateUser(user model.User) error {
 func (s *AuthService) GenerateToken(login, password string) (model.User, error) {
 	user, err := s.repo.GetUser(login)
 	if err != nil {
-		return empty, err
+		return empty, InvalidDate
 	}
 
-	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password+salt)); err != nil {
-		return empty, err
+	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password+salt)); err != nil {
+		return empty, InvalidDate
 	}
+
 	token, err := uuid.NewV4()
 	if err != nil {
 		log.Print(err)
@@ -65,7 +66,7 @@ func (s *AuthService) GenerateToken(login, password string) (model.User, error) 
 	return user, nil
 }
 
-func (s *AuthService) GeneratePassword(password string) string {
+func generatePassword(password string) string {
 	bytes, _ := bcrypt.GenerateFromPassword([]byte(password+salt), bcrypt.DefaultCost)
 	return string(bytes)
 }

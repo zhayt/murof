@@ -24,7 +24,7 @@ type Post interface {
 	ShowMyPosts(int) ([]model.Post, error)
 	ShowMyCommentPosts(int) ([]model.Post, error)
 	ShowMyLikedPosts(int) ([]model.Post, error)
-	DeletePost(int) error
+	DeletePost(int, int) error
 }
 
 type Comment interface {
