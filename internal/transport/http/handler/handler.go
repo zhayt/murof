@@ -37,29 +37,33 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodGet:
-
-		var posts []model.Post
-		posts, err := h.service.Post.ShowAllPosts()
+		temp, err := template.ParseFiles("ui/homepage.html")
 		if err != nil {
+			h.l.Error.Println("Parse file error:")
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+
+		var posts []model.Post
+		posts, err = h.service.Post.ShowAllPosts()
+		if err != nil {
+			h.l.Error.Printf("Show all posts error: %s", err.Error())
+			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+			return
+		}
+
+		h.l.Info.Println("All post founded, count %v", len(posts))
 
 		display := Display{
 			Username: user.Username,
 			Posts:    posts,
 		}
 
-		temp, err := template.ParseFiles("ui/homepage.html")
-		if err != nil {
-			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-			return
-		}
-
 		if err = temp.Execute(w, display); err != nil {
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
+
 	case http.MethodPost:
 		var category []string
 
@@ -68,6 +72,7 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 
 			posts, err := h.service.Post.ShowAllPosts()
 			if err != nil {
+				h.l.Error.Printf("show all post error: %s", err.Error())
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
@@ -145,8 +150,10 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 			}
 			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
 		}
+
 	default:
 		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+		return
 	}
 }
 

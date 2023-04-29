@@ -13,11 +13,13 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		temp, err := template.ParseFiles("ui/signin.html")
 		if err != nil {
+			h.l.Error.Printf("Parse file error:")
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		if err = temp.Execute(w, temp); err != nil {
+			h.l.Error.Printf("Execute tmpl error:")
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -46,6 +48,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 			http.Redirect(w, r, "/", http.StatusSeeOther)
 		}
 	default:
+		h.l.Error.Printf("Method not allowed error:")
 		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
@@ -56,11 +59,13 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		temp, err := template.ParseFiles("ui/signup.html")
 		if err != nil {
+			h.l.Error.Printf("Parse file error:")
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
 
 		if err = temp.Execute(w, temp); err != nil {
+			h.l.Error.Printf("Execute tmpl error:")
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
@@ -73,6 +78,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		repeatpass := r.FormValue("repeatspw")
 
 		if repeatpass != password {
+			h.l.Error.Println("Password not equal error:", password, repeatpass)
 			errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 			return
 		} else {
@@ -85,6 +91,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := h.service.CreateUser(signUp); err != nil {
+			h.l.Error.Printf("Create user error: %s", err.Error())
 			if errors.Is(err, service.InvalidDate) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
@@ -94,9 +101,11 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		h.l.Info.Printf("User created: email-%s", email)
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 
 	default:
+		h.l.Error.Println("Method not allowed error:")
 		errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
@@ -108,9 +117,6 @@ func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
 		Value: "",
 		Path:  "/",
 	})
-	/*user := r.Context().Value(ctxUserKey).(models.User)
-	if err := h.service.DeleteToken(user.Token); err != nil {
-		log.Fatal("delete token in logout", err)
-	}*/
+
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
