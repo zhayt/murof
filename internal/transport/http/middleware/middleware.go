@@ -6,37 +6,77 @@ import (
 	"fmt"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
+	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"net/http"
 	"time"
 )
 
 type Middleware struct {
 	user service.Authorization
+	l    *logger.Logger
+}
+
+func (m *Middleware) LogRequest(next http.HandlerFunc) http.HandlerFunc {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		m.l.Info.Println(fmt.Sprintf("%s - %s %s %s", r.RemoteAddr, r.Proto, r.Method, r.URL.String()))
+
+		next.ServeHTTP(w, r)
+	})
 }
 
 func NewMiddleware(user service.Authorization) *Middleware {
 	return &Middleware{user: user}
 }
 
-func (m *Middleware) MiddleWare(handler http.HandlerFunc) http.HandlerFunc {
+func (m *Middleware) WithSessionBlocked(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		token, err := r.Cookie("session_token")
+		if err != nil {
+			if errors.Is(err, http.ErrNoCookie) {
+				next.ServeHTTP(w, r)
+				return
+			}
+
+			m.l.Error.Printf("failed to get cookie: %s", err.Error())
+			return
+		}
+
+		user, err := m.user.GetUserByToken(token.Value)
+		if err != nil {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		if user.TokenDuration.Before(time.Now()) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		http.Redirect(w, r, "/", http.StatusForbidden)
+	}
+}
+
+func (m *Middleware) AuthorizationRequired(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var user model.User
-		t, err := r.Cookie("session_token")
+		token, err := r.Cookie("session_token")
 		if err != nil {
 			switch {
 			case errors.Is(err, http.ErrNoCookie):
-				handler.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, model.User{})))
-			case errors.Is(err, t.Valid()):
-				fmt.Println(w, http.StatusBadRequest, "invalid cookie value")
+				next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, model.User{})))
+			case errors.Is(err, token.Valid()):
+				m.l.Error.Println("invalid cookie value")
 			}
-			fmt.Println(w, http.StatusBadRequest, "failed to get cookie")
+			m.l.Error.Println("failed to get cookie")
 			return
 		}
-		user, err = m.user.GetUserByToken(t.Value)
+
+		user, err = m.user.GetUserByToken(token.Value)
 		if err != nil {
-			handler.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, model.User{})))
+			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, model.User{})))
 			return
 		}
+
 		if user.TokenDuration.Before(time.Now()) {
 			if err := m.user.DeleteToken(user.Token); err != nil {
 				fmt.Println(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
@@ -46,6 +86,6 @@ func (m *Middleware) MiddleWare(handler http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
-		handler.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, user)))
+		next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, user)))
 	}
 }
