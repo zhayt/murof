@@ -91,10 +91,11 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 
 			h.l.Info.Printf("Posts by category founded id", categoryID, "amount", len(posts))
 
+			categories := []string{"IT", "Sport", "Education", "News", "Health"}
 			display := Display{
 				Username: user.Username,
 				Posts:    posts,
-				Category: []string{"IT"},
+				Category: []string{categories[categoryID-1]},
 			}
 
 			temp, err := template.ParseFiles("ui/homepage.html")
