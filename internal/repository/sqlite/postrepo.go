@@ -46,6 +46,7 @@ func (r *PostRepo) CreatePost(post model.Post) error {
 		if _, err = r.db.Exec(`INSERT INTO post_category(post_id, category_id) VALUES (?, ?)`, postID, categoryID); err != nil {
 			r.l.Error.Printf("couldn't create category for post: postID", postID, categoryID, err.Error())
 		}
+		r.l.Info.Println("Category for post added categoryID:", categoryID, "for post", postID)
 	}
 
 	return nil
@@ -57,8 +58,8 @@ func (r *PostRepo) ShowAllPosts() ([]model.Post, error) {
         post.date, group_concat(category.title) AS category 
     FROM 
         post 
-        LEFT JOIN post_category ON post.id = post_category.post_id 
-        LEFT JOIN category ON category.id = post_category.category_id 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
     GROUP BY 
         post.id`)
 	if err != nil {
@@ -68,12 +69,16 @@ func (r *PostRepo) ShowAllPosts() ([]model.Post, error) {
 	var posts []model.Post
 	for rows.Next() {
 		post := new(model.Post)
+
 		var category string
+
 		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
 			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
 		}
 
+		r.l.Info.Println("Category:", category, "postID:", post.Id)
 		post.Category = strings.Split(category, ",")
+		r.l.Info.Println("Post", post)
 		posts = append(posts, *post)
 	}
 
@@ -86,16 +91,19 @@ func (r *PostRepo) GetPostByID(id string) (*model.Post, error) {
         post.date, group_concat(category.title) AS category 
     FROM 
         post 
-        LEFT JOIN post_category ON post.id = post_category.post_id 
-        LEFT JOIN category ON category.id = post_category.category_id 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
     GROUP BY 
         post.id
         HAVING post.id = ?`, id)
 	if err != nil {
 		return nil, fmt.Errorf("couldn't get post by id: %w", err)
 	}
+
 	var post model.Post
+
 	var category string
+
 	for rows.Next() {
 		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
 			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
@@ -103,17 +111,18 @@ func (r *PostRepo) GetPostByID(id string) (*model.Post, error) {
 	}
 
 	post.Category = strings.Split(category, ",")
+
 	return &post, nil
 }
 
 func (r *PostRepo) ChangePost(post model.Post, oldPostId int) error {
 	query := `UPDATE post SET title=$1,description=$2 where id=$3;`
+
 	if _, err := r.db.Exec(query, post.Title, post.Description, oldPostId); err != nil {
 		return fmt.Errorf("couldn't change post: %w", err)
-
 	}
-	return nil
 
+	return nil
 }
 
 func (r *PostRepo) ShowMyPosts(userId int) ([]model.Post, error) {
@@ -122,8 +131,8 @@ func (r *PostRepo) ShowMyPosts(userId int) ([]model.Post, error) {
         post.date, group_concat(category.title) AS category 
     FROM 
         post 
-        LEFT JOIN post_category ON post.id = post_category.post_id 
-        LEFT JOIN category ON category.id = post_category.category_id 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
     GROUP BY 
         post.id
         HAVING post.user_id = ?`, userId)
@@ -135,7 +144,9 @@ func (r *PostRepo) ShowMyPosts(userId int) ([]model.Post, error) {
 
 	for rows.Next() {
 		post := new(model.Post)
+
 		var category string
+
 		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
 			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
 		}
@@ -154,8 +165,8 @@ func (r *PostRepo) ShowMyCommentPosts(userId int) ([]model.Post, error) {
         post.date, group_concat(category.title) AS category 
     FROM 
         post 
-        LEFT JOIN post_category ON post.id = post_category.post_id 
-        LEFT JOIN category ON category.id = post_category.category_id 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
     GROUP BY 
         post.id
         HAVING post.id in (select postId from comment where userId=?)`, userId)
@@ -167,7 +178,9 @@ func (r *PostRepo) ShowMyCommentPosts(userId int) ([]model.Post, error) {
 
 	for rows.Next() {
 		post := new(model.Post)
+
 		var category string
+
 		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
 			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
 		}
@@ -186,8 +199,8 @@ func (r *PostRepo) ShowMyLikedPosts(userId int) ([]model.Post, error) {
         post.date, group_concat(category.title) AS category 
     FROM 
         post 
-        LEFT JOIN post_category ON post.id = post_category.post_id 
-        LEFT JOIN category ON category.id = post_category.category_id 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
     GROUP BY 
         post.id
         HAVING post.id in (select postId from like where userId=? and postId not null)`, userId)
@@ -196,9 +209,12 @@ func (r *PostRepo) ShowMyLikedPosts(userId int) ([]model.Post, error) {
 	}
 
 	var posts []model.Post
+
 	for rows.Next() {
 		post := new(model.Post)
+
 		var category string
+
 		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
 			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
 		}
@@ -211,26 +227,38 @@ func (r *PostRepo) ShowMyLikedPosts(userId int) ([]model.Post, error) {
 	return posts, nil
 }
 
-func (r *PostRepo) GetPostsByCategoty(categories []string) ([]model.Post, error) {
-	strings.Join(categories, ", ")
-
+func (r *PostRepo) GetPostsByCategory(categoryID int) ([]model.Post, error) {
 	var posts []model.Post
 
-	var post model.Post
+	r.l.Info.Printf("CategoryID-", categoryID)
 
-	for _, category := range categories {
-		rows, err := r.db.Query(`select * from post where category=?`, category)
-		if err != nil {
-			return []model.Post{}, fmt.Errorf("couldn't get post by category: %w", err)
+	rows, err := r.db.Query(`SELECT 
+        post.id, post.title, post.description, post.like, post.dislike, post.user_id, post.author, 
+        post.date, group_concat(category.title) AS category 
+    FROM 
+        post 
+        INNER JOIN post_category ON post.id = post_category.post_id 
+        INNER JOIN category ON category.id = post_category.category_id 
+    WHERE category_id = ?
+    GROUP BY 
+        post.id`, categoryID)
+
+	if err != nil {
+		return []model.Post{}, fmt.Errorf("couldn't get post by category: %w", err)
+	}
+
+	for rows.Next() {
+		var post model.Post
+
+		var category string
+
+		if err = rows.Scan(&post.Id, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.AuthorId, &post.Author, &post.Date, &category); err != nil {
+			return nil, fmt.Errorf("couldn't get all post, scan error: %w", err)
 		}
 
-		for rows.Next() {
-			if err = rows.Scan(&post.Id, &post.AuthorId, &post.Author, &post.Title, &post.Description, &post.Like, &post.Dislike, &post.Date); err != nil {
-				return []model.Post{}, fmt.Errorf("couldn't get post by category, sacn error: %w", err)
-			}
+		post.Category = strings.Split(category, ",")
 
-			posts = append(posts, post)
-		}
+		posts = append(posts, post)
 	}
 
 	return posts, nil
