@@ -32,7 +32,7 @@ const (
 
 	categoryTable = `CREATE TABLE IF NOT EXISTS category(
     	id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    	title TEXT NOT NULL
+    	title TEXT NOT NULL UNIQUE 
     );
 		INSERT INTO category(title)
 		VALUES ("IT"), ("Sport"), ("Education"), ("News"), ("Health");
@@ -91,6 +91,22 @@ func Dial(cfg *config.Config) (*sql.DB, error) {
 
 func InnitDB(db *sql.DB) error {
 	for _, table := range []string{userTable, postTable, commentTable, likeTable, dislikeTable, categoryTable, postCategoryTable} {
+		if table == categoryTable {
+			var count int
+			err := db.QueryRow("SELECT COUNT(*) FROM category").Scan(&count)
+			if err != nil {
+				fmt.Printf(err.Error())
+			}
+
+			if count == 0 { // if category table is empty, insert data
+				_, err = db.Exec(categoryTable)
+				if err != nil {
+					return fmt.Errorf("couldn't init db: error: %w table: %s", err, categoryTable)
+				}
+			}
+			continue
+		}
+
 		_, err := db.Exec(table)
 		if err != nil {
 			return fmt.Errorf("couldn't init db: error: %w table: %s", err, table)
