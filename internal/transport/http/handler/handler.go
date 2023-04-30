@@ -113,6 +113,11 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if user.Username == "" {
+			errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			return
+		}
+
 		if r.FormValue("postLike") != "" {
 			postId, _ := strconv.Atoi(r.FormValue("postLike"))
 			like := model.Like{
@@ -150,10 +155,8 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) MyPosts(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
 
-	var empty model.User
-
-	if user == empty {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+	if user.Username == "" {
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 	}
 
 	switch r.Method {
@@ -209,9 +212,9 @@ func (h *Handler) MyPosts(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) MyCommentPosts(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
-	var empty model.User
-	if user == empty {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+
+	if user.Username == "" {
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 	}
 	switch r.Method {
 	case http.MethodGet:
@@ -275,8 +278,8 @@ func (h *Handler) MyCommentPosts(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) MyLikedPosts(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
-	var empty model.User
-	if user == empty {
+
+	if user.Username == "" {
 		http.Redirect(w, r, "/signin", http.StatusSeeOther)
 	}
 

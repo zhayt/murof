@@ -8,6 +8,7 @@ import (
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"golang.org/x/crypto/bcrypt"
 	"net/mail"
+	"strings"
 	"time"
 )
 
@@ -39,7 +40,16 @@ func (s *AuthService) CreateUser(user model.User) error {
 
 	user.Password = generatePassword(user.Password)
 
-	return s.repo.CreateUser(user)
+	err := s.repo.CreateUser(user)
+	if err != nil {
+		if strings.Contains(err.Error(), "UNIQUE constraint failed:") {
+			return fmt.Errorf("not unique data: %w", InvalidDate)
+		}
+
+		return err
+	}
+
+	return nil
 }
 
 func (s *AuthService) GenerateToken(login, password string) (model.User, error) {

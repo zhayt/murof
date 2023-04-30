@@ -52,7 +52,7 @@ func (m *Middleware) WithSessionBlocked(next http.HandlerFunc) http.HandlerFunc 
 			return
 		}
 
-		http.Redirect(w, r, "/", http.StatusForbidden)
+		http.Redirect(w, r, "/", http.StatusSeeOther)
 	}
 }
 
@@ -72,17 +72,19 @@ func (m *Middleware) AuthorizationRequired(next http.HandlerFunc) http.HandlerFu
 		}
 
 		user, err = m.user.GetUserByToken(token.Value)
+		m.l.Info.Println("token:", token.Value)
 		if err != nil {
 			next.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), model.CtxUserKey, model.User{})))
 			return
 		}
 
+		m.l.Info.Println("User with token", user.Login, token.Value)
 		if user.TokenDuration.Before(time.Now()) {
 			if err := m.user.DeleteToken(user.Token); err != nil {
 				fmt.Println(w, http.StatusInternalServerError, http.StatusText(http.StatusInternalServerError))
 				return
 			}
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
