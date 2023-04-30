@@ -27,7 +27,7 @@ const (
 			like INTEGER DEFAULT 0,
 			dislike INTEGER DEFAULT 0,
 			date TEXT,
-			FOREIGN KEY(user_id) REFERENCES user(id)
+			FOREIGN KEY(user_id) REFERENCES user(id) ON DELETE CASCADE
 			);`
 
 	categoryTable = `CREATE TABLE IF NOT EXISTS category(
@@ -41,8 +41,8 @@ const (
     		id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     		post_id INTEGER NOT NULL,
     		category_id INTEGER NOT NULL,
-    		FOREIGN KEY(post_id) REFERENCES post(id)
-    		FOREIGN KEY(category_id) REFERENCES category(id)
+    		FOREIGN KEY(post_id) REFERENCES post(id) ON DELETE CASCADE,
+    		FOREIGN KEY(category_id) REFERENCES category(id) ON DELETE CASCADE
 	);`
 
 	commentTable = `CREATE TABLE IF NOT EXISTS comment(
@@ -54,7 +54,7 @@ const (
 			like INTEGER DEFAULT 0,
 			dislike INTEGER DEFAULT 0,
 			date TEXT,
-			FOREIGN KEY(postId) REFERENCES post(id)
+			FOREIGN KEY(postId) REFERENCES post(id) ON DELETE CASCADE
 			);`
 	likeTable = `CREATE TABLE IF NOT EXISTS like(
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
@@ -62,7 +62,7 @@ const (
 			userId INTEGER,
 			commentId INTEGER,
 			active INTEGER DEFAULT 0,
-			FOREIGN KEY(postId) REFERENCES post(id)
+			FOREIGN KEY(postId) REFERENCES post(id) ON DELETE CASCADE
 		);`
 	dislikeTable = `CREATE TABLE IF NOT EXISTS dislike(
 			id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 
@@ -70,7 +70,7 @@ const (
 			userId INTEGER,
 			commentId INTEGER,
 			active INTEGER DEFAULT 0,
-			FOREIGN KEY(postId) REFERENCES post(id)
+			FOREIGN KEY(postId) REFERENCES post(id) ON DELETE CASCADE
 		);`
 )
 
