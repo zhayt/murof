@@ -15,7 +15,8 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
 
 	if user.Username == "" {
-		http.Redirect(w, r, "/signin", http.StatusSeeOther)
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		return
 	}
 
 	switch r.Method {
@@ -104,6 +105,11 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		}
 		dispPost.Comments = *comments
 	case http.MethodPost:
+		if user.Username == "" {
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+			return
+		}
+
 		if r.FormValue("postLike") != "" {
 			postId, _ := strconv.Atoi(r.FormValue("postLike"))
 			like := model.Like{
@@ -208,6 +214,11 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(model.CtxUserKey).(model.User)
+	if user.Username == "" {
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		return
+	}
+
 	postId := r.URL.Query().Get("id")
 	oldPost, err := h.service.GetPostByID(postId)
 	if err != nil {
@@ -257,6 +268,9 @@ func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.Context().Value(model.CtxUserKey).(model.User)
+	if user.Username == "" {
+
+	}
 	postID, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
