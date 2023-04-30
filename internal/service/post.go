@@ -29,8 +29,19 @@ func (s *PostService) CreatePost(post model.Post) error {
 	post.Title = strings.TrimSpace(post.Title)
 	post.Description = strings.TrimSpace(post.Description)
 
-	if post.Title == "" && len(post.Title) >= 40 || post.Description == "" || len(post.Category) == 0 {
-		return InvalidDate
+	if post.Title == "" || len(post.Title) >= 40 {
+		s.l.Error.Printf("Title:", post.Title)
+		return fmt.Errorf("title error: %w", InvalidDate)
+	}
+
+	if post.Description == "" {
+		s.l.Error.Printf("Content:", post.Description)
+		return fmt.Errorf("content error: %w", InvalidDate)
+	}
+
+	if len(post.Category) == 0 {
+		s.l.Error.Printf("Category:", post.Title)
+		return fmt.Errorf("empty category error: %w", InvalidDate)
 	}
 
 	return s.repo.CreatePost(post)
@@ -95,12 +106,16 @@ func (s *PostService) ShowMyLikedPosts(userId int) ([]model.Post, error) {
 	return posts, nil
 }
 
-func (s *PostService) GetPostsByCategoty(category []string) ([]model.Post, error) {
-	posts, err := s.repo.GetPostsByCategoty(category)
-	if err != nil {
-		log.Println(err)
-		return nil, err
+func (s *PostService) GetPostsByCategory(categoryID int) ([]model.Post, error) {
+	if categoryID < 1 && categoryID > 5 {
+		return []model.Post{}, InvalidDate
 	}
+
+	posts, err := s.repo.GetPostsByCategory(categoryID)
+	if err != nil {
+		return posts, err
+	}
+
 	return posts, nil
 }
 
