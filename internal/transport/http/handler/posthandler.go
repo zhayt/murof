@@ -2,13 +2,12 @@ package handler
 
 import (
 	"errors"
+	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
+	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 	"html/template"
 	"net/http"
 	"strconv"
 	"time"
-
-	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
-	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 )
 
 func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
