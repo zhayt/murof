@@ -1,9 +1,11 @@
 package service
 
 import (
+	"fmt"
 	models "github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/repository"
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
+	"strings"
 )
 
 type CommentService struct {
@@ -19,6 +21,11 @@ func NewCommentService(repo repository.Comment, l *logger.Logger) *CommentServic
 }
 
 func (c *CommentService) CreateComment(commnet models.Comment) error {
+	commnet.Text = strings.TrimSpace(commnet.Text)
+	if commnet.Text == "" {
+		return fmt.Errorf("emty comment text: %w", InvalidDate)
+	}
+
 	return c.repo.CreateComment(commnet)
 }
 
