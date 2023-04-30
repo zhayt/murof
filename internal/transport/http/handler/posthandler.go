@@ -5,7 +5,6 @@ import (
 	"html/template"
 	"net/http"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
@@ -138,6 +137,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 			}
 
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
+			return
 		}
 
 		if r.FormValue("commentLike") != "" {
@@ -168,18 +168,15 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 			}
 
 			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
+			return
 		}
 
 		if user.Token == "" {
-			http.Redirect(w, r, "/signin", http.StatusSeeOther)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
 		commentText := r.FormValue("comment")
-		if strings.TrimSpace(commentText) == "" {
-			http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
-			return
-		}
 
 		comment := model.Comment{
 			UserId: user.Id,
@@ -190,6 +187,11 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err = h.service.Comment.CreateComment(comment); err != nil {
+			if errors.Is(err, service.InvalidDate) {
+				http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
+				return
+			}
+
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
