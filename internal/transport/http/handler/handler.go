@@ -114,7 +114,7 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if user.Username == "" {
-			errorHandler(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
+			http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 			return
 		}
 
