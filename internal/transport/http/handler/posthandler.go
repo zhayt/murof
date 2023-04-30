@@ -239,7 +239,7 @@ func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-	case http.MethodPatch:
+	case http.MethodPost:
 		category := r.Form["category"]
 
 		title := r.FormValue("title")

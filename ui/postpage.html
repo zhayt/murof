@@ -21,7 +21,7 @@
             <a href="/post/change/?id={{.Post.Id}}"><button type="button" class="back">Edit</button></a>
             <form action="/post/delete/?id={{.Post.Id}}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить этот пост?');">
               <input type="hidden" name="_method" value="DELETE">
-              <button type="submit">Delete</button>
+              <button type="submit" class="deletebutton">Delete</button>
             </form>            
             {{end}}
           </div>
