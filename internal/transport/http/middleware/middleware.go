@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net/http"
+	"time"
+
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
-	"net/http"
-	"time"
 )
 
 type Middleware struct {
