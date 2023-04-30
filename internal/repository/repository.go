@@ -20,7 +20,7 @@ type Post interface {
 	CreatePost(model.Post) error
 	ShowAllPosts() ([]model.Post, error)
 	GetPostByID(string) (*model.Post, error)
-	GetPostsByCategoty([]string) ([]model.Post, error)
+	GetPostsByCategory(int) ([]model.Post, error)
 	ChangePost(model.Post, int) error
 	ShowMyPosts(int) ([]model.Post, error)
 	ShowMyCommentPosts(int) ([]model.Post, error)
