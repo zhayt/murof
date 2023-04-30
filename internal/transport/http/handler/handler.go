@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"errors"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
 	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
@@ -45,6 +46,7 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 		}
 
 		var posts []model.Post
+
 		posts, err = h.service.Post.ShowAllPosts()
 		if err != nil {
 			h.l.Error.Printf("Show all posts error: %s", err.Error())
@@ -65,68 +67,51 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 		}
 
 	case http.MethodPost:
-		var category []string
-
-		if r.FormValue("category"+string('5')) != "" {
-			var posts []model.Post
-
-			posts, err := h.service.Post.ShowAllPosts()
+		if r.FormValue("category") != "" {
+			// fmt.Println(category)
+			categoryID, err := strconv.Atoi(r.FormValue("category"))
 			if err != nil {
-				h.l.Error.Printf("show all post error: %s", err.Error())
+				h.l.Error.Printf("convert category id error", err.Error())
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
+
+			posts, err := h.service.Post.GetPostsByCategory(categoryID)
+			if err != nil {
+				h.l.Error.Printf("Get posts by category error", err.Error())
+
+				if errors.Is(err, service.InvalidDate) {
+					errorHandler(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+					return
+				}
+
+				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
+				return
+			}
+
+			h.l.Info.Printf("Posts by category founded id", categoryID, "amount", len(posts))
 
 			display := Display{
 				Username: user.Username,
 				Posts:    posts,
+				Category: []string{"IT"},
 			}
 
 			temp, err := template.ParseFiles("ui/homepage.html")
 			if err != nil {
+				h.l.Error.Printf("Parse file error", err.Error())
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
 
+			h.l.Info.Printf("To display struct", display)
 			if err = temp.Execute(w, display); err != nil {
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
-
 			return
 		}
-		for i := '0'; i <= '4'; i++ {
-			if r.FormValue("category"+string(i)) != "" {
-				category = append(category, r.FormValue("category"+string(i)))
-			}
-		}
-		if len(category) != 0 {
-			// fmt.Println(category)
-			posts, err := h.service.Post.GetPostsByCategoty(category)
-			if err != nil {
-				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
 
-			display := Display{
-				Username: user.Username,
-				Posts:    posts,
-				Category: category,
-			}
-
-			temp, err := template.ParseFiles("ui/homepage.html")
-			if err != nil {
-				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-
-			if err = temp.Execute(w, display); err != nil {
-				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
-				return
-			}
-		} else {
-			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
-		}
 		if r.FormValue("postLike") != "" {
 			postId, _ := strconv.Atoi(r.FormValue("postLike"))
 			like := model.Like{
@@ -150,6 +135,8 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 				errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 				return
 			}
+			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
+		} else {
 			http.Redirect(w, r, r.URL.Path, http.StatusSeeOther)
 		}
 
