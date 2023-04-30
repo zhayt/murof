@@ -15,5 +15,5 @@ COPY --from=builder /app/app .
 COPY --from=builder /app/config/config.json config/
 COPY --from=builder /app/ui ui
 
-EXPOSE 8000
+EXPOSE 8080
 CMD ["./app"]
