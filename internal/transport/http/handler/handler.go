@@ -80,7 +80,7 @@ func (h *Handler) Home(w http.ResponseWriter, r *http.Request) {
 			if err != nil {
 				h.l.Error.Printf("Get posts by category error", err.Error())
 
-				if errors.Is(err, service.InvalidDate) {
+				if errors.Is(err, service.InvalidData) {
 					errorHandler(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 					return
 				}

@@ -30,7 +30,7 @@ func (h *Handler) SignIn(w http.ResponseWriter, r *http.Request) {
 		user, err := h.service.GenerateToken(email, password)
 		if err != nil {
 			h.l.Error.Printf("Generate toke error: %s", err.Error())
-			if errors.Is(err, service.InvalidDate) {
+			if errors.Is(err, service.InvalidData) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
 			}
@@ -92,7 +92,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 
 		if err := h.service.CreateUser(signUp); err != nil {
 			h.l.Error.Printf("Create user error: %s", err.Error())
-			if errors.Is(err, service.InvalidDate) {
+			if errors.Is(err, service.InvalidData) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
 			}

@@ -23,7 +23,7 @@ func NewCommentService(repo repository.Comment, l *logger.Logger) *CommentServic
 func (c *CommentService) CreateComment(commnet models.Comment) error {
 	commnet.Text = strings.TrimSpace(commnet.Text)
 	if commnet.Text == "" {
-		return fmt.Errorf("emty comment text: %w", InvalidDate)
+		return fmt.Errorf("emty comment text: %w", InvalidData)
 	}
 
 	return c.repo.CreateComment(commnet)

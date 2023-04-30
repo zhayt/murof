@@ -47,7 +47,7 @@ func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
 		err := h.service.Post.CreatePost(post)
 		if err != nil {
 			h.l.Error.Printf("Create post error: %s", err.Error())
-			if errors.Is(err, service.InvalidDate) {
+			if errors.Is(err, service.InvalidData) {
 				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
 				return
 			}
@@ -186,7 +186,7 @@ func (h *Handler) Post(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err = h.service.Comment.CreateComment(comment); err != nil {
-			if errors.Is(err, service.InvalidDate) {
+			if errors.Is(err, service.InvalidData) {
 				http.Redirect(w, r, "/post/?id="+PostID, http.StatusSeeOther)
 				return
 			}
@@ -254,6 +254,11 @@ func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 		}
 
 		if err := h.service.Post.ChangePost(newPost, *oldPost, user); err != nil {
+			if errors.Is(err, service.InvalidData) {
+				errorHandler(w, http.StatusText(http.StatusBadRequest), http.StatusBadRequest)
+				return
+			}
+
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}

@@ -29,13 +29,13 @@ func NewAuthService(repo repository.Authorization, l *logger.Logger) *AuthServic
 
 func (s *AuthService) CreateUser(user model.User) error {
 	if !checkLogin(user.Login) {
-		return InvalidDate
+		return InvalidData
 	}
 	if !checkPassword(user.Password) {
-		return InvalidDate
+		return InvalidData
 	}
 	if !checkUsername(user.Username) {
-		return InvalidDate
+		return InvalidData
 	}
 
 	user.Password = generatePassword(user.Password)
@@ -43,7 +43,7 @@ func (s *AuthService) CreateUser(user model.User) error {
 	err := s.repo.CreateUser(user)
 	if err != nil {
 		if strings.Contains(err.Error(), "UNIQUE constraint failed:") {
-			return fmt.Errorf("not unique data: %w", InvalidDate)
+			return fmt.Errorf("not unique data: %w", InvalidData)
 		}
 
 		return err
@@ -55,11 +55,11 @@ func (s *AuthService) CreateUser(user model.User) error {
 func (s *AuthService) GenerateToken(login, password string) (model.User, error) {
 	user, err := s.repo.GetUser(login)
 	if err != nil {
-		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidDate)
+		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidData)
 	}
 
 	if err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(password+salt)); err != nil {
-		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidDate)
+		return empty, fmt.Errorf("%s: %w", err.Error(), InvalidData)
 	}
 
 	token, err := uuid.NewV4()

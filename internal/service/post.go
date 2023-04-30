@@ -23,7 +23,7 @@ func NewPostService(repo repository.Post, l *logger.Logger) *PostService {
 	}
 }
 
-var InvalidDate = errors.New("invalid date")
+var InvalidData = errors.New("invalid date")
 
 func (s *PostService) CreatePost(post model.Post) error {
 	post.Title = strings.TrimSpace(post.Title)
@@ -31,17 +31,17 @@ func (s *PostService) CreatePost(post model.Post) error {
 
 	if post.Title == "" || len(post.Title) >= 40 {
 		s.l.Error.Printf("Title:", post.Title)
-		return fmt.Errorf("title error: %w", InvalidDate)
+		return fmt.Errorf("title error: %w", InvalidData)
 	}
 
 	if post.Description == "" {
 		s.l.Error.Printf("Content:", post.Description)
-		return fmt.Errorf("content error: %w", InvalidDate)
+		return fmt.Errorf("content error: %w", InvalidData)
 	}
 
 	if len(post.Category) == 0 {
 		s.l.Error.Printf("Category:", post.Title)
-		return fmt.Errorf("empty category error: %w", InvalidDate)
+		return fmt.Errorf("empty category error: %w", InvalidData)
 	}
 
 	return s.repo.CreatePost(post)
@@ -73,9 +73,21 @@ func (s *PostService) ChangePost(newpost, oldPost model.Post, user model.User) e
 	if user.Username != oldPost.Author {
 		return fmt.Errorf("Uncorrect change post author ")
 	}
+
+	newpost.Title = strings.TrimSpace(newpost.Title)
+	newpost.Description = strings.TrimSpace(newpost.Description)
+	if newpost.Title == "" && len(newpost.Title) >= 40 {
+		return fmt.Errorf("Title invalid: %w", InvalidData)
+	}
+
+	if newpost.Description == "" {
+		return fmt.Errorf("Description invalid: %w", InvalidData)
+	}
+
 	if err := s.repo.ChangePost(newpost, oldPost.Id); err != nil {
 		return fmt.Errorf("CHANGE :%w", err)
 	}
+
 	return nil
 }
 
@@ -108,7 +120,7 @@ func (s *PostService) ShowMyLikedPosts(userId int) ([]model.Post, error) {
 
 func (s *PostService) GetPostsByCategory(categoryID int) ([]model.Post, error) {
 	if categoryID < 1 && categoryID > 5 {
-		return []model.Post{}, InvalidDate
+		return []model.Post{}, InvalidData
 	}
 
 	posts, err := s.repo.GetPostsByCategory(categoryID)
