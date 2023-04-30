@@ -102,7 +102,7 @@ func (h *Handler) SignUp(w http.ResponseWriter, r *http.Request) {
 		}
 
 		h.l.Info.Printf("User created: email-%s", email)
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
 
 	default:
 		h.l.Error.Println("Method not allowed error:")
