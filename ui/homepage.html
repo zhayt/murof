@@ -232,8 +232,9 @@
                       <textarea class="content" readonly disabled>{{.Description}}</textarea>
                     </div>
                     <div class="row4">
-                
-                      <div class="category">#{{.Category}}</div>
+                      {{range .Category}}
+                         <div class="category">#{{.}}</div>
+                      {{end}}
       
                     <form style="display: flex; align-items: center;">
                       <button type="button" style="border: medium none; background-image: none; background: transparent; background-color: transparent; ">
