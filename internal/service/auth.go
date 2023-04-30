@@ -8,11 +8,14 @@ import (
 	"github.com/zhayt/clean-arch-tmp-forum/logger"
 	"golang.org/x/crypto/bcrypt"
 	"net/mail"
+	"regexp"
 	"strings"
 	"time"
 )
 
 const salt = "Sfasfasfasfas"
+
+var EmailRX = regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,4}$`)
 
 var empty model.User
 
@@ -113,6 +116,11 @@ func checkPassword(password string) bool {
 
 func checkLogin(email string) bool {
 	_, err := mail.ParseAddress(email)
+
+	if !EmailRX.MatchString(email) {
+		return false
+	}
+
 	if err != nil {
 		return false
 	}
