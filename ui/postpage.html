@@ -19,7 +19,11 @@
             <a href="/"><button type="button" class="back">Back</button></a>
             {{if .Auth}}
             <a href="/post/change/?id={{.Post.Id}}"><button type="button" class="back">Edit</button></a>
-            <a href="/post/delete/?id={{.Post.Id}}"><button type="button" class="back1">Delete</button></a>{{end}}
+            <form action="/post/delete/?id={{.Post.Id}}" method="POST" onsubmit="return confirm('Вы уверены, что хотите удалить этот пост?');">
+              <input type="hidden" name="_method" value="DELETE">
+              <button type="submit">Delete</button>
+            </form>            
+            {{end}}
           </div>
         </div>
         {{if .Post}}
