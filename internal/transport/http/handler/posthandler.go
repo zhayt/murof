@@ -269,15 +269,20 @@ func (h *Handler) DeletePost(w http.ResponseWriter, r *http.Request) {
 
 	user := r.Context().Value(model.CtxUserKey).(model.User)
 	if user.Username == "" {
-
+		http.Redirect(w, r, "/sign-in", http.StatusSeeOther)
+		return
 	}
+
 	postID, err := strconv.Atoi(r.URL.Query().Get("id"))
 	if err != nil {
 		http.Redirect(w, r, "/", http.StatusSeeOther)
 		return
 	}
 
-	_ = h.service.Post.DeletePost(user.Id, postID)
+	err = h.service.Post.DeletePost(user.Id, postID)
+	if err != nil {
+		h.l.Error.Println("Delete post error: userID:", user.Id, "postID:", postID, "error:", err.Error())
+	}
 
 	http.Redirect(w, r, "/", http.StatusSeeOther)
 }
