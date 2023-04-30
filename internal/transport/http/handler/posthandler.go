@@ -2,13 +2,14 @@ package handler
 
 import (
 	"errors"
-	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
-	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 	"html/template"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/zhayt/clean-arch-tmp-forum/internal/model"
+	"github.com/zhayt/clean-arch-tmp-forum/internal/service"
 )
 
 func (h *Handler) CreatePost(w http.ResponseWriter, r *http.Request) {
@@ -238,7 +239,7 @@ func (h *Handler) ChangePost(w http.ResponseWriter, r *http.Request) {
 			errorHandler(w, http.StatusText(http.StatusInternalServerError), http.StatusInternalServerError)
 			return
 		}
-	case http.MethodPost:
+	case http.MethodPatch:
 		category := r.Form["category"]
 
 		title := r.FormValue("title")
