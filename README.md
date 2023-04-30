@@ -74,13 +74,6 @@ The comment table stores comment data, including ID, user ID, post ID, text, and
 
 The like table stores like data, including ID, user ID, post/comment ID, and value.
 
-## Tests
-
-To run tests, navigate to the `tests` directory and run the following command:
-```bash
-go test
-```
-
 ## Packages
 
 The project uses the following packages:
@@ -98,4 +91,4 @@ Please make sure to update tests as appropriate.
 
 ## License
 
-[MIT](https://www.google.com/url?sa=i&url=https%3A%2F%2Fwww.motorbiscuit.com%2Frare-mm-vanity-license-plate-costs-24-5-million%2F&psig=AOvVaw0CrnNFWozJiThSdw5HJB49&ust=1682948792736000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCJjXqfve0f4CFQAAAAAdAAAAABAD)
+[MIT](https://i.imgur.com/pUverGl.jpeg)
