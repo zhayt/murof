@@ -1,12 +1,12 @@
 # ТРЕБОВАНИЕ К ПАРОЛЮ
-## ДЛИНА ПАРОЛЯ ДОЛЖНА СОСТАВЛЯТЬ 8 СИМВОЛОВ И ВКЛЮЧАТЬ ЦИФРОВЫЕ, ПРОСТЫЕ ИЛИ ЛАТИНСКИЕ СИМВОЛЫ
-## ПОД ПРОСТЫМ Я ИМЕЮ ВВИДУ (!@#$%^&*())
-## И ХВАТИТЬ ФЕЙЛИТЬ ЗА ТО ЧТО НЕ СМОГЛИ ЗАРЕГАТЬСЯ
+## ДЛИНА ПАРОЛЯ ДОЛЖНА СОСТАВЛЯТЬ 8 СИМВОЛОВ И ВКЛЮЧАТЬ ЦИФРОВЫЕ, ПРОСТЫЕ СИМВОЛЫ ИЛИ ЛАТИНСКИЕ БУКВЫ
+## ** ПОД ПРОСТЫМ Я ИМЕЮ ВВИДУ ЭТИ СИМВОЛЫ (!@#$%^&*()[]{};:'"<,.>?/\+_-=)
+## И ХВАТИТ ФЕЙЛИТЬ ЗА ТО ЧТО НЕ СМОГЛИ ЗАРЕГАТЬСЯ
 ## ЭТО ТУПО
-
+# ЕСЛИ ЧТО СИЖУ НА 4том L08
 # Forum
 
-This is a web forum created using Go, HTML, and SQLite. The forum allows users to communicate with each other, create posts and comments, associate categories with posts, and like/dislike posts and comments. The project also includes a filter mechanism that allows users to filter posts by categories, created posts, and liked posts.
+This is a web forum created using Go, HTML, and SQLite. The forum allows users to create posts and comments, associate categories with posts, and like/dislike posts and comments. The project also includes a filter mechanism that allows users to filter posts by categories, created posts, and liked posts.
 
 ## Installation
 
@@ -34,7 +34,8 @@ http://localhost:8080
 
 ### Registration
 
-To register as a new user on the forum, enter your email, username, and password. If the email is already taken, an error response will be returned.
+To register as a new user on the forum, enter your email, username, and password. If the email or name is already taken, an error response will be returned. 
+There is also a password requirement (read about password requirement in the top of the topic).
 
 ### Login
 
