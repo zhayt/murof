@@ -1,9 +1,3 @@
-# ТРЕБОВАНИЕ К ПАРОЛЮ
-## ДЛИНА ПАРОЛЯ ДОЛЖНА СОСТАВЛЯТЬ 8 СИМВОЛОВ И ВКЛЮЧАТЬ ЦИФРОВЫЕ, ПРОСТЫЕ СИМВОЛЫ ИЛИ ЛАТИНСКИЕ БУКВЫ
-## ** ПОД ПРОСТЫМ Я ИМЕЮ ВВИДУ ЭТИ СИМВОЛЫ (!@#$%^&*()[]{};:'"<,.>?/\+_-=)
-## И ХВАТИТ ФЕЙЛИТЬ ЗА ТО ЧТО НЕ СМОГЛИ ЗАРЕГАТЬСЯ
-## ЭТО ТУПО
-# ЕСЛИ ЧТО СИЖУ НА 4том L08
 # Forum
 
 This is a web forum created using Go, HTML, and SQLite. The forum allows users to create posts and comments, associate categories with posts, and like/dislike posts and comments. The project also includes a filter mechanism that allows users to filter posts by categories, created posts, and liked posts.
